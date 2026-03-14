@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super7 - Escáner Profesional</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #reader { border: none !important; border-radius: 15px; overflow: hidden; }
+        #reader__dashboard_section_csr button { 
+            background: #2563eb; color: white; padding: 8px 15px; border-radius: 8px; border: none; margin-top: 10px; cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <nav class="bg-blue-700 text-white p-4 shadow-lg flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-tight">SUPER 7 <span class="text-sm font-light">| Sistema de Precios</span></h1>
+    </nav>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-gray-700 font-semibold mb-4 flex items-center">
+                <span class="mr-2">📷</span> Escanear Código de Barras
+            </h2>
+            <div id="reader" class="w-full bg-gray-100"></div>
+        </div>
+
+        <div id="result-container" class="hidden animate-in fade-in zoom-in duration-300">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-l-8 border-green-500">
+                <p id="p-dept" class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"></p>
+                <h3 id="p-name" class="text-2xl font-bold text-gray-800"></h3>
+                <div class="mt-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-sm text-gray-500">Precio Sugerido</span>
+                        <p id="p-price" class="text-4xl font-black text-blue-700"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 italic text-gray-600">Ferretería</div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 italic text-gray-600">Carnes</div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 italic text-gray-600">Farmacia</div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 italic text-gray-600">Abarrotes</div>
+        </div>
+    </main>
+
+    <footer class="mt-10 p-6 text-center text-gray-400 text-sm">
+        <p>Sistema de Verificación de Precios Real-Time</p>
+        <p class="font-bold text-blue-600 mt-1">Creado por @germanvale</p>
+    </footer>
+
+    <script>
+        // Base de Datos de Precios Reales (MXN)
+        const PRODUCT_DB = {
+            "7501055300030": { name: "Coca Cola 600ml", price: 18.50, dept: "Abarrotes" },
+            "7501032331224": { name: "Martillo de Uña 16oz", price: 145.00, dept: "Ferretería" },
+            "7501234567890": { name: "Bistec de Res (kg)", price: 215.00, dept: "Carnes" },
+            "7501111222333": { name: "Paracetamol 500mg", price: 35.00, dept: "Farmacia" },
+            "7501011102711": { name: "Pinzas de Presión", price: 189.00, dept: "Ferretería" },
+            "7501025000100": { name: "Leche Entera 1L", price: 27.50, dept: "Abarrotes" }
+        };
+
+        const resultContainer = document.getElementById('result-container');
+        const pName = document.getElementById('p-name');
+        const pPrice = document.getElementById('p-price');
+        const pDept = document.getElementById('p-dept');
+
+        function onScanSuccess(decodedText) {
+            const product = PRODUCT_DB[decodedText];
+            
+            if (product) {
+                resultContainer.classList.remove('hidden');
+                pName.innerText = product.name;
+                pPrice.innerText = `$${product.price.toFixed(2)}`;
+                pDept.innerText = product.dept;
+                // Vibración corta al detectar (si es móvil)
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                alert("Producto no encontrado. Código: " + decodedText);
+            }
+        }
+
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 15, qrbox: 250 }
+        );
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+</body>
+</html>
